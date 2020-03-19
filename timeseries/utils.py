@@ -10,15 +10,15 @@ from .imports import *
 
 # Cell
 def ToTensor(o):
+    if isinstance(o, torch.Tensor): return o
     if isinstance(o, np.ndarray):  return torch.from_numpy(o)
-    if not isinstance(o, torch.Tensor): print(f"Can't convert {type(o)} to torch.Tensor")
-    return o
+    else: print(f"Can't convert {type(o)} to torch.Tensor")
 
 
 def ToArray(o):
+    if isinstance(o, np.ndarray): return o
     if isinstance(o, torch.Tensor): o = o.cpu().numpy()
-    elif not isinstance(o, np.ndarray): print(f"Can't convert {type(o)} to np.array")
-    return o
+    else: print(f"Can't convert {type(o)} to np.array")
 
 
 def To3DTensor(o):
