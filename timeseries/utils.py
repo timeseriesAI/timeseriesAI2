@@ -23,64 +23,66 @@ def ToArray(o):
 
 def To3DTensor(o):
     o = ToTensor(o)
-    if o.ndim == 1: o = o[None, None]
-    elif o.ndim == 2: o = o[:, None]
-    assert o.ndim == 3, f'Please, review input dimensions {o.ndim}'
-    return o
+    if o.ndim == 3: return o
+    elif o.ndim == 1: return o[None, None]
+    elif o.ndim == 2: return o[:, None]
+    assert False, f'Please, review input dimensions {o.ndim}'
 
 
 def To2DTensor(o):
     o = ToTensor(o)
-    if o.ndim == 1: o = o[None]
-    elif o.ndim == 3: o = torch.squeeze(o, 0)
-    assert o.ndim == 2, f'Please, review input dimensions {o.ndim}'
-    return o
+    if o.ndim == 2: return o
+    elif o.ndim == 1: return o[None]
+    elif o.ndim == 3: return torch.squeeze(o, 0)
+    assert False, f'Please, review input dimensions {o.ndim}'
 
 
 def To1DTensor(o):
     o = ToTensor(o)
-    if o.ndim == 3: o = torch.squeeze(o, 1)
-    if o.ndim == 2: o = torch.squeeze(o, 0)
-    assert o.ndim == 1, f'Please, review input dimensions {o.ndim}'
-    return o
+    if o.ndim == 1: return o
+    elif o.ndim == 3: return torch.squeeze(o, 1)
+    if o.ndim == 2: return torch.squeeze(o, 0)
+    assert False, f'Please, review input dimensions {o.ndim}'
 
 
 def To3DArray(o):
     o = ToArray(o)
-    if o.ndim == 1: o = o[None, None]
-    elif o.ndim == 2: o = o[:, None]
-    elif o.ndim == 4: o = o[0]
-    assert o.ndim == 3, f'Please, review input dimensions {o.ndim}'
-    return o
+    if o.ndim == 3: return o
+    elif o.ndim == 1: return o[None, None]
+    elif o.ndim == 2: return o[:, None]
+    assert False, f'Please, review input dimensions {o.ndim}'
 
 
 def To2DArray(o):
     o = ToArray(o)
-    if o.ndim == 1: o = o[None]
-    if o.ndim == 3: o = np.squeeze(o, 0)
-    assert o.ndim == 2, f'Please, review input dimensions {o.ndim}'
-    return o
+    if o.ndim == 2: return o
+    elif o.ndim == 1: return o[None]
+    elif o.ndim == 3: return np.squeeze(o, 0)
+    assert False, f'Please, review input dimensions {o.ndim}'
 
 
 def To1DArray(o):
     o = ToArray(o)
-    if o.ndim == 3: o = np.squeeze(o, 1)
-    if o.ndim == 2: o = np.squeeze(o, 0)
-    assert o.ndim == 1, f'Please, review input dimensions {o.ndim}'
-    return o
+    if o.ndim == 1: return o
+    elif o.ndim == 3: o = np.squeeze(o, 1)
+    elif o.ndim == 2: o = np.squeeze(o, 0)
+    assert False, f'Please, review input dimensions {o.ndim}'
 
 
 def To3D(o):
+    if o.ndim == 3: return o
     if isinstance(o, np.ndarray): return To3DArray(o)
     if isinstance(o, torch.Tensor): return To3DTensor(o)
 
 
 def To2D(o):
+    if o.ndim == 2: return o
     if isinstance(o, np.ndarray): return To2DArray(o)
     if isinstance(o, torch.Tensor): return To2DTensor(o)
 
 
 def To1D(o):
+    if o.ndim == 1: return o
     if isinstance(o, np.ndarray): return To1DArray(o)
     if isinstance(o, torch.Tensor): return To1DTensor(o)
 

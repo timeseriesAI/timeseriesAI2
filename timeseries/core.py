@@ -14,13 +14,12 @@ from .utils import *
 
 # Cell
 class TSTensor(TensorBase):
-    def __new__(cls, o):
-        res = To2DPlusTensor(o)
+    '''Returns a tensor of at least 2 dims of type torch.float32 and class TSTensor'''
+    def __new__(cls, o, dtype=torch.float32, **kwargs):
+        res = ToType(dtype)(To2DPlusTensor(o))
         res.__class__ = cls
+        res._meta = kwargs
         return res
-
-    # @classmethod
-    # def create(cls, o): return cls(To2DPlusTensor(o)) # creates a TSTensor with at least 2 dims of type float
 
     @property
     def vars(self): return self.shape[-2]
@@ -36,7 +35,7 @@ class TSTensor(TensorBase):
         if self.ndim >= 3:   return f'TSTensor(samples:{self.shape[-3]}, vars:{self.shape[-2]}, len:{self.shape[-1]})'
         elif self.ndim == 2: return f'TSTensor(vars:{self.shape[-2]}, len:{self.shape[-1]})'
         elif self.ndim == 1: return f'TSTensor(len:{self.shape[-1]})'
-        else: return self
+        else: return f'TSTensor(float)'
 
     def show(self, ax=None, ctx=None, title=None, **kwargs):
         ax = ifnone(ax,ctx)
@@ -48,10 +47,9 @@ class TSTensor(TensorBase):
         return ax
 
 @Transform
-def ToTSTensor(o:np.ndarray):
+def ToTSTensor(o:np.ndarray, dtype=torch.float32, **kwargs):
     """ Transforms input to tensor of dtype torch.float32"""
-    # return TSTensor.create(o)
-    return TSTensor(o)
+    return TSTensor(o, dtype=dtype, **kwargs)
 
 # Cell
 class NumpyDatasets(FilteredBase):
