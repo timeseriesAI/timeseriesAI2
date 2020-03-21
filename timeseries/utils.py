@@ -11,13 +11,13 @@ from .imports import *
 # Cell
 def ToTensor(o):
     if isinstance(o, torch.Tensor): return o
-    if isinstance(o, np.ndarray):  return torch.from_numpy(o)
+    elif isinstance(o, np.ndarray):  return torch.from_numpy(o)
     else: print(f"Can't convert {type(o)} to torch.Tensor")
 
 
 def ToArray(o):
     if isinstance(o, np.ndarray): return o
-    if isinstance(o, torch.Tensor): o = o.cpu().numpy()
+    elif isinstance(o, torch.Tensor): return o.cpu().numpy()
     else: print(f"Can't convert {type(o)} to np.array")
 
 
@@ -115,8 +115,9 @@ def To3DPlusArray(o):
 
 def ToType(dtype):
     def _to_type(o, dtype=dtype):
-        if isinstance(o, np.ndarray) and o.dtype != dtype: o = o.astype(dtype)
-        elif isinstance(o, torch.Tensor) and o.dtype != dtype: o = o.to(dtype=dtype)
+        if o.dtype == dtype: return o
+        elif isinstance(o, torch.Tensor): o = o.to(dtype=dtype)
+        elif isinstance(o, np.ndarray): o = o.astype(dtype)
         return o
     return _to_type
 
