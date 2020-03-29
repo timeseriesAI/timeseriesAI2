@@ -32,3 +32,20 @@ def last_saved():
     else: print(f'Total elapsed time {elapsed:.0f} s')
     print(strftime("%d-%m-%Y %H:%M:%S", gmtime()))
     return int(elapsed)
+
+# Cell
+from git import Repo # needs gitpython
+from nbdev.export import Config as nb_Config
+from nbdev.export import *
+
+def git_add(fname, commit_msg='.'):
+    repo = Repo(nb_Config().nbs_path.parent)
+    notebook2script(fname)
+    nb = read_nb(fname)
+    default = find_default_export(nb['cells'])
+    py = [os.path.join(nb_Config().lib_path,*default.split('.'))+'.py',
+          os.path.join(nb_Config().nbs_path,fname)
+         ]
+    repo.index.add(py)
+    repo.index.commit(commit_msg)
+    return py
