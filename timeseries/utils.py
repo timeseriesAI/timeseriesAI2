@@ -3,7 +3,7 @@
 __all__ = ['ToTensor', 'ToArray', 'To3DTensor', 'To2DTensor', 'To1DTensor', 'To3DArray', 'To2DArray', 'To1DArray',
            'To3D', 'To2D', 'To1D', 'To2DPlus', 'To3DPlus', 'To2DPlusTensor', 'To2DPlusArray', 'To3DPlusTensor',
            'To3DPlusArray', 'ToType', 'bytes2size', 'bytes2GB', 'delete_all_in_dir', 'reverse_dict', 'is_tuple',
-           'itemify', 'ifnotnone', 'ifnoneelse']
+           'itemify', 'ifnotnone', 'ifnoneelse', 'cycle_dl', 'device', 'cpus']
 
 # Cell
 from .imports import *
@@ -12,13 +12,13 @@ from .imports import *
 def ToTensor(o):
     if isinstance(o, torch.Tensor): return o
     elif isinstance(o, np.ndarray):  return torch.from_numpy(o)
-    else: print(f"Can't convert {type(o)} to torch.Tensor")
+    assert False, f"Can't convert {type(o)} to torch.Tensor"
 
 
 def ToArray(o):
     if isinstance(o, np.ndarray): return o
     elif isinstance(o, torch.Tensor): return o.cpu().numpy()
-    else: print(f"Can't convert {type(o)} to np.array")
+    assert False, f"Can't convert {type(o)} to np.array"
 
 
 def To3DTensor(o):
@@ -164,3 +164,13 @@ def ifnotnone(a, b):
 def ifnoneelse(a, b, c):
     "`b` if `a` is None else `c`"
     return b if a is None else c
+
+# Cell
+# This is a convenience function will use later proposed by Thomas Capelle @tcapelle to be able to easily benchmark performance
+def cycle_dl(dl):
+    for x,y in iter(dl): pass
+
+# Cell
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+defaults.device = device
+cpus = defaults.cpus

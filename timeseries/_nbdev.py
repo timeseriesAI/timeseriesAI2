@@ -28,14 +28,30 @@ index = {"ToTensor": "000_utils.ipynb",
          "itemify": "000_utils.ipynb",
          "ifnotnone": "000_utils.ipynb",
          "ifnoneelse": "000_utils.ipynb",
+         "cycle_dl": "000_utils.ipynb",
+         "device": "000_utils.ipynb",
+         "defaults.device": "000_utils.ipynb",
+         "cpus": "000_utils.ipynb",
          "TSTensor": "001_core.ipynb",
          "ToTSTensor": "001_core.ipynb",
+         "NumpyTensor": "001_core.ipynb",
+         "ToNumpyTensor": "001_core.ipynb",
+         "TSTensorBlock": "001_core.ipynb",
+         "TSDataLoaders": "001_core.ipynb",
          "NumpyDatasets": "001_core.ipynb",
+         "add_data": "001_core.ipynb",
+         "NumpyDatasets.add_data": "001_core.ipynb",
+         "TSTfmdDL": "001_core.ipynb",
+         "show_tuple": "001_core.ipynb",
          "decompress_from_url": "002_data.ipynb",
          "get_UCR_univariate_list": "002_data.ipynb",
          "get_UCR_multivariate_list": "002_data.ipynb",
          "stack_padding": "002_data.ipynb",
          "get_UCR_data": "002_data.ipynb",
+         "np_convert": "002_data.ipynb",
+         "np_collate": "002_data.ipynb",
+         "np_str_obj_array_pattern": "002_data.ipynb",
+         "np_collate_err_msg_format": "002_data.ipynb",
          "noop": "102_InceptionTime.ipynb",
          "same_padding1d": "100_layers.ipynb",
          "ZeroPad1d": "100_layers.ipynb",
@@ -55,8 +71,8 @@ modules = ["utils.py",
            "models/ResNet.py",
            "models/InceptionTime.py"]
 
-doc_url = "https://timeseriesAI.github.io/timeseries/"
+doc_url = "https://oguiza.github.io/timeseries/"
 
-git_url = "https://github.com/timeseriesAI/timeseries/tree/master/"
+git_url = "https://github.com/oguiza/timeseries/tree/master/"
 
 def custom_doc_links(name): return None
