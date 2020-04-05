@@ -3,7 +3,7 @@ import fastcore
 import torch
 from fastai2.imports import *
 from fastai2.data.all import *
-from fastai2.vision.all import *
+from fastai2.vision.data import get_grid
 import pprint
 import psutil
 import scipy as sp
