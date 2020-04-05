@@ -38,12 +38,12 @@ class TSTensor(TensorBase):
         elif self.ndim == 1: return f'TSTensor(len:{self.shape[-1]})'
         else: return f'TSTensor(float)'
 
-    def show(self, ax=None, ctx=None, title=None, **kwargs):
+    def show(self, ax=None, ctx=None, title=None, title_color='black', **kwargs):
         ax = ifnone(ax,ctx)
         if ax is None: fig, ax = plt.subplots(**kwargs)
         ax.plot(self.T)
         ax.axis(xmin=0, xmax=self.shape[-1] - 1)
-        ax.set_title(title, weight='bold')
+        ax.set_title(title, weight='bold', color=title_color)
         plt.tight_layout()
         return ax
 

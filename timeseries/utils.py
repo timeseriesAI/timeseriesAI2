@@ -3,7 +3,8 @@
 __all__ = ['ToTensor', 'ToArray', 'To3DTensor', 'To2DTensor', 'To1DTensor', 'To3DArray', 'To2DArray', 'To1DArray',
            'To3D', 'To2D', 'To1D', 'To2DPlus', 'To3DPlus', 'To2DPlusTensor', 'To2DPlusArray', 'To3DPlusTensor',
            'To3DPlusArray', 'ToType', 'bytes2size', 'bytes2GB', 'delete_all_in_dir', 'reverse_dict', 'is_tuple',
-           'itemify', 'ifnotnone', 'ifnoneelse', 'cycle_dl', 'device', 'cpus']
+           'itemify', 'is_none', 'ifisnone', 'ifnotnone', 'ifisnotnone', 'ifnoneelse', 'ifisnoneelse', 'cycle_dl',
+           'device', 'cpus']
 
 # Cell
 from .imports import *
@@ -156,19 +157,34 @@ def is_tuple(o): return isinstance(o, tuple)
 def itemify(*o): return L(*o).zip()
 
 # Cell
+def is_none(o):
+    return o in [[], [None], None]
+
+def ifisnone(a, b):
+    "`a` if `a` is None else `b`"
+    return None if is_none(a) else b
+
+
 def ifnotnone(a, b):
     "`a` if `a` is None else `b`"
-    return a if a is None else b
+    return a if a is not None else b
 
-# Cell
+def ifisnotnone(a, b):
+    "`a` if `a` is None else `b`"
+    return a if not is_none(a) else b
+
 def ifnoneelse(a, b, c):
     "`b` if `a` is None else `c`"
     return b if a is None else c
 
+def ifisnoneelse(a, b, c):
+    "`b` if `a` is None else `c`"
+    return b if is_none(a) else c
+
 # Cell
 # This is a convenience function will use later proposed by Thomas Capelle @tcapelle to be able to easily benchmark performance
 def cycle_dl(dl):
-    for x,y in iter(dl): pass
+    for _ in iter(dl): pass
 
 # Cell
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
