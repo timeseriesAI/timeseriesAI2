@@ -38,21 +38,21 @@ index = {"ToTensor": "000_utils.ipynb",
          "cpus": "000_utils.ipynb",
          "TSTensor": "001_core.ipynb",
          "ToTSTensor": "001_core.ipynb",
+         "TSDataLoaders": "001_core.ipynb",
+         "TSTensorBlock": "001_core.ipynb",
          "NumpyTensor": "001_core.ipynb",
          "ToNumpyTensor": "001_core.ipynb",
-         "TSTensorBlock": "001_core.ipynb",
-         "TSDataLoaders": "001_core.ipynb",
          "PytorchDataset": "001_core.ipynb",
          "NumpyDatasets": "001_core.ipynb",
          "TSDatasets": "001_core.ipynb",
-         "NumpyDataLoader": "001_core.ipynb",
-         "show_tuple": "001_core.ipynb",
-         "TSDataLoader": "001_core.ipynb",
          "add_ds": "001_core.ipynb",
          "add_test": "001_core.ipynb",
          "add_unlabeled": "001_core.ipynb",
          "NumpyDatasets.add_test": "001_core.ipynb",
          "NumpyDatasets.add_unlabeled": "001_core.ipynb",
+         "NumpyDataLoader": "001_core.ipynb",
+         "show_tuple": "001_core.ipynb",
+         "TSDataLoader": "001_core.ipynb",
          "decompress_from_url": "002_data.ipynb",
          "get_UCR_univariate_list": "002_data.ipynb",
          "get_UCR_multivariate_list": "002_data.ipynb",
@@ -81,8 +81,8 @@ modules = ["utils.py",
            "models/ResNet.py",
            "models/InceptionTime.py"]
 
-doc_url = "https://oguiza.github.io/timeseries/"
+doc_url = "https://timeseriesAI.github.io/timeseries/"
 
-git_url = "https://github.com/oguiza/timeseries/tree/master/"
+git_url = "https://github.com/timeseriesAI/timeseries/tree/master/"
 
 def custom_doc_links(name): return None
