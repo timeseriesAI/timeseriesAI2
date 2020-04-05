@@ -9,6 +9,7 @@ from fastcore.all import *
 from fastai2.torch_imports import *
 from fastai2.torch_core import *
 from fastai2.data.all import *
+from fastai2.vision.data import get_grid
 
 # Cell
 from .imports import *
