@@ -8,6 +8,7 @@ from fastai2.learner import *
 from fastai2.metrics import *
 from fastai2.callback.all import *
 from fastai2.vision.data import *
+from fastai2.interpret import *
 import pprint
 import psutil
 import scipy as sp

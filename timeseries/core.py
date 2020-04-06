@@ -160,11 +160,8 @@ class NumpyDatasets(Datasets):
     def length(self): return self[0][0].shape[-1]
     @property
     def types(self):
-        if self.tls:
-            types = [type(tl[0]) if isinstance(tl[0], torch.Tensor) else torch.as_tensor for tl in self.tls]
-            if self._xtype is not None: types[0] = self._xtype
-            if len(types) == 2 and self._ytype is not None: types[1] = self._ytype
-            return types
+        return [ifnone(_typ, type(self.tls[i]) if isinstance(self.tls[i], torch.Tensor) else tensor)
+                for i,_typ in zip(range(len(self.items)), [self._xtype, self._ytype])]
     @property
     def items(self): return tuple([tl.items for tl in self.tls])
     @items.setter
