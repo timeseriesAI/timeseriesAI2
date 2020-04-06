@@ -4,12 +4,7 @@ __all__ = ['decompress_from_url', 'get_UCR_univariate_list', 'get_UCR_multivaria
            'get_UCR_data', 'np_convert', 'np_collate', 'np_str_obj_array_pattern', 'np_collate_err_msg_format']
 
 # Cell
-from .imports import *
-from .utils import *
-from .core import *
-
-# Cell
-from fastai2.data.all import *
+from timeseries import *
 
 # Cell
 import tempfile

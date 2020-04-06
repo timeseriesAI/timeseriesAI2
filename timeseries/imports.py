@@ -10,3 +10,4 @@ import scipy as sp
 
 PATH = Path(os.getcwd())
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+from IPython.display import display, HTML
