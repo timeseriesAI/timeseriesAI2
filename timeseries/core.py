@@ -2,7 +2,7 @@
 
 __all__ = ['NumpyTensor', 'ToNumpyTensor', 'TSTensor', 'ToTSTensor', 'NumpyTensorBlock', 'TSTensorBlock',
            'PytorchDataset', 'NumpyDatasets', 'TSDatasets', 'add_ds', 'NumpyDataLoader', 'show_tuple', 'TSDataLoader',
-           'NumpyDataLoaders', 'TSDataLoaders']
+           'NumpyDataLoaders', 'TSDataLoaders', 'load_learner_all']
 
 # Cell
 from timeseries import *
@@ -17,7 +17,7 @@ class NumpyTensor(TensorBase):
 
     def __getitem__(self, idx):
         res = super().__getitem__(idx)
-        return self.__class__(res)
+        return type(self)(res)
 
     def __repr__(self):
         return f'NumpyTensor(shape:{list(self.shape)})'
@@ -32,9 +32,8 @@ class NumpyTensor(TensorBase):
         plt.tight_layout()
         return ax
 
-@Transform
-def ToNumpyTensor(o:(np.ndarray, torch.Tensor)):
-    return NumpyTensor(o)
+class ToNumpyTensor(Transform):
+    def encodes(self, o:np.ndarray): return NumpyTensor(o)
 
 # Cell
 class TSTensor(TensorBase):
@@ -53,13 +52,13 @@ class TSTensor(TensorBase):
 
     def __getitem__(self, idx):
         res = super().__getitem__(idx)
-        return self.__class__(res)
+        return type(self)(res)
 
     def __repr__(self):
         if self.ndim >= 3:   return f'TSTensor(samples:{self.shape[-3]}, vars:{self.shape[-2]}, len:{self.shape[-1]})'
         elif self.ndim == 2: return f'TSTensor(vars:{self.shape[-2]}, len:{self.shape[-1]})'
         elif self.ndim == 1: return f'TSTensor(len:{self.shape[-1]})'
-        else: return f'TSTensor(float)'
+        else: return f'TSTensor({self.dtype})'
 
     def show(self, ax=None, ctx=None, title=None, title_color='black', **kwargs):
         if self.ndim != 2: self = self.__class__(To2DTensor(self))
@@ -71,14 +70,11 @@ class TSTensor(TensorBase):
         plt.tight_layout()
         return ax
 
-@Transform
-def ToTSTensor(o:(np.ndarray, torch.Tensor), dtype=torch.float32, **kwargs):
-    """ Transforms input to tensor of dtype torch.float32"""
-    return TSTensor(o, dtype=dtype, **kwargs)
+class ToTSTensor(Transform):
+    def encodes(self, o:np.ndarray): return TSTensor(o)
 
 # Cell
 class NumpyTensorBlock():
-    "A basic wrapper that links defaults transforms for the data block API"
     def __init__(self, type_tfms=None, item_tfms=None, batch_tfms=None, dl_type=None, dls_kwargs=None):
         self.type_tfms  =                 L(type_tfms)
         self.item_tfms  = ToNumpyTensor + L(item_tfms)
@@ -86,7 +82,6 @@ class NumpyTensorBlock():
         self.dl_type,self.dls_kwargs = dl_type,({} if dls_kwargs is None else dls_kwargs)
 
 class TSTensorBlock():
-    "A basic wrapper that links defaults transforms for the data block API"
     def __init__(self, type_tfms=None, item_tfms=None, batch_tfms=None, dl_type=None, dls_kwargs=None):
         self.type_tfms  =              L(type_tfms)
         self.item_tfms  = ToTSTensor + L(item_tfms)
@@ -95,8 +90,8 @@ class TSTensorBlock():
 
 # Cell
 class PytorchDataset():
-    def __init__(self, X, y=None): self.X, self.y = torch.as_tensor(X), torch.as_tensor(y)
-    def __getitem__(self, idx): return (self.X[idx], self.y[idx])
+    def __init__(self, X, y=None): self.X, self.y = tensor(X), tensor(y)
+    def __getitem__(self, idx): return (self.X[idx], self.y[idx]) if self.y is not None else (self.X[idx], )
     def __len__(self): return len(self.X)
 
 # Cell
@@ -134,8 +129,7 @@ class NumpyDatasets(Datasets):
     def length(self): return self[0][0].shape[-1]
     @property
     def types(self):
-        return [ifnone(_typ, type(self.tls[i]) if isinstance(self.tls[i], torch.Tensor) else tensor)
-                for i,_typ in zip(range(len(self.items)), [self._xtype, self._ytype])]
+        return [ifnone(_typ, type(tl[0]) if isinstance(tl[0], torch.Tensor) else tensor) for tl,_typ in zip(self.tls, [self._xtype, self._ytype])]
     @property
     def items(self): return tuple([tl.items for tl in self.tls])
     @items.setter
@@ -181,12 +175,6 @@ class NumpyDataLoader(TfmdDL):
     do_item = noops
     def create_batch(self, b): return self.dataset[b]
 
-    @property
-    def vars(self): return self.dataset[0][0].shape[-2]
-
-    @property
-    def length(self): return self.dataset[0][0].shape[-1]
-
     @delegates(plt.subplots)
     def show_batch(self, b=None, ctxs=None, max_n=9, nrows=3, ncols=3, figsize=(16, 10), **kwargs):
         b = self.one_batch()
@@ -212,12 +200,18 @@ def show_tuple(tup, **kwargs):
     "Display a timeseries plot from a decoded tuple"
     tup[0].show(title='unlabeled' if len(tup) == 1 else tup[1], **kwargs)
 
-class TSDataLoader(NumpyDataLoader): pass
+class TSDataLoader(NumpyDataLoader):
+    @property
+    def vars(self): return self.dataset[0][0].shape[-2]
+
+    @property
+    def length(self): return self.dataset[0][0].shape[-1]
 
 # Cell
 _batch_tfms = ('after_item','before_batch','after_batch')
 
 class NumpyDataLoaders(DataLoaders):
+
     def __init__(self, *loaders, path='.', device=default_device()):
         self.loaders,self.path = list(loaders),Path(path)
         self.device = device
@@ -228,7 +222,7 @@ class NumpyDataLoaders(DataLoaders):
         "Create timeseries dataloaders from arrays (X and y, unless unlabeled)"
         if splitter is None: splitter = RandomSplitter(valid_pct=valid_pct, seed=seed)
         getters = [ItemGetter(0), ItemGetter(1)] if y is not None else [ItemGetter(0)]
-        dblock = DataBlock(blocks=(TSTensorBlock, CategoryBlock),
+        dblock = DataBlock(blocks=(NumpyTensorBlock, CategoryBlock),
                            getters=getters,
                            splitter=splitter,
                            item_tfms=item_tfms,
@@ -251,4 +245,68 @@ class NumpyDataLoaders(DataLoaders):
         if device == None: device = default_device()
         return cls(*[dl_type(d, bs=b, **k) for d,k,b in zip(ds, kwargs, bs)], path=path, device=device)
 
-class TSDataLoaders (NumpyDataLoaders): pass
+class TSDataLoaders(DataLoaders):
+    def __init__(self, *loaders, path='.', device=default_device()):
+        self.loaders,self.path = list(loaders),Path(path)
+        self.device = device
+
+    @classmethod
+    @delegates(DataLoaders.from_dblock)
+    def from_numpy(cls, X, y=None, splitter=None, valid_pct=0.2, seed=0, item_tfms=None, batch_tfms=None, **kwargs):
+        "Create timeseries dataloaders from arrays (X and y, unless unlabeled)"
+        if splitter is None: splitter = RandomSplitter(valid_pct=valid_pct, seed=seed)
+        getters = [ItemGetter(0), ItemGetter(1)] if y is not None else [ItemGetter(0)]
+        dblock = DataBlock(blocks=(TSTensorBlock, CategoryBlock),
+                           getters=getters,
+                           splitter=splitter,
+                           item_tfms=item_tfms,
+                           batch_tfms=batch_tfms)
+
+        source = itemify(X) if y is None else itemify(X,y)
+        return cls.from_dblock(dblock, source, **kwargs)
+
+    @classmethod
+    def from_dsets(cls, *ds, path='.',  bs=64, device=None, dl_type=TSDataLoader, **kwargs):
+        default = (True,) + (False,) * (len(ds)-1)
+        defaults = {'shuffle': default, 'drop_last': default}
+        for nm in _batch_tfms:
+            if nm in kwargs: kwargs[nm] = Pipeline(kwargs[nm])
+        kwargs = merge(defaults, {k: tuplify(v, match=ds) for k,v in kwargs.items()})
+        kwargs = [{k: v[i] for k,v in kwargs.items()} for i in range_of(ds)]
+        if not is_listy(bs): bs = [bs]
+        if len(bs) != len(ds): bs = bs * len(ds)
+        assert len(ds) == len(kwargs) == len(bs)
+        if device == None: device = default_device()
+        return cls(*[dl_type(d, bs=b, **k) for d,k,b in zip(ds, kwargs, bs)], path=path, device=device)
+
+# Cell
+@patch
+def save_all(self:Learner, path='export', dls_fname='dls', model_fname='model', learner_fname='learner'):
+
+    path = Path(path)
+    if not os.path.exists(path): os.makedirs(path)
+
+    # Save the dls
+    torch.save(self.dls, path/dls_fname)
+
+    # Saves the model along with optimizer
+    self.model_dir = path
+    self.save(model_fname)
+
+    # Export learn without the items and the optimizer state for inference
+    self.export(path/f'{learner_fname}.pkl')
+
+    print(f'Learner saved:')
+    print(f"path          = '{path}'")
+    print(f"dls_fname     = '{dls_fname}'")
+    print(f"model_fname   = '{model_fname}.pth'")
+    print(f"learner_fname = '{learner_fname}.pkl'")
+
+
+def load_learner_all(path='export', dls_fname='dls', model_fname='model', learner_fname='learner', cpu=True):
+    path = Path(path)
+    learn = load_learner(path/f'{learner_fname}.pkl', cpu=cpu)
+    learn.load(f'{model_fname}')
+    dls = torch.load(path/dls_fname)
+    learn.dls = dls
+    return learn
