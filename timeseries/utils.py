@@ -2,7 +2,7 @@
 
 __all__ = ['ToTensor', 'ToArray', 'To3DTensor', 'To2DTensor', 'To1DTensor', 'To3DArray', 'To2DArray', 'To1DArray',
            'To3D', 'To2D', 'To1D', 'To2DPlus', 'To3DPlus', 'To2DPlusTensor', 'To2DPlusArray', 'To3DPlusTensor',
-           'To3DPlusArray', 'ToType', 'bytes2size', 'bytes2GB', 'delete_all_in_dir', 'reverse_dict', 'is_tuple',
+           'To3DPlusArray', 'Todtype', 'bytes2size', 'bytes2GB', 'delete_all_in_dir', 'reverse_dict', 'is_tuple',
            'itemify', 'is_none', 'ifisnone', 'ifnoneelse', 'ifisnoneelse', 'ifelse', 'cycle_dl', 'device', 'cpus']
 
 # Cell
@@ -33,15 +33,15 @@ def To2DTensor(o):
     o = ToTensor(o)
     if o.ndim == 2: return o
     elif o.ndim == 1: return o[None]
-    elif o.ndim == 3: return torch.squeeze(o, 0)
+    elif o.ndim == 3: return o[0]#torch.squeeze(o, 0)
     assert False, f'Please, review input dimensions {o.ndim}'
 
 
 def To1DTensor(o):
     o = ToTensor(o)
     if o.ndim == 1: return o
-    elif o.ndim == 3: return torch.squeeze(o, 1)
-    if o.ndim == 2: return torch.squeeze(o, 0)
+    elif o.ndim == 3: return o[0,0]#torch.squeeze(o, 1)
+    if o.ndim == 2: return o[0]#torch.squeeze(o, 0)
     assert False, f'Please, review input dimensions {o.ndim}'
 
 
@@ -57,15 +57,15 @@ def To2DArray(o):
     o = ToArray(o)
     if o.ndim == 2: return o
     elif o.ndim == 1: return o[None]
-    elif o.ndim == 3: return np.squeeze(o, 0)
+    elif o.ndim == 3: return 0[0]#np.squeeze(o, 0)
     assert False, f'Please, review input dimensions {o.ndim}'
 
 
 def To1DArray(o):
     o = ToArray(o)
     if o.ndim == 1: return o
-    elif o.ndim == 3: o = np.squeeze(o, 1)
-    elif o.ndim == 2: o = np.squeeze(o, 0)
+    elif o.ndim == 3: o = 0[0,0]#np.squeeze(o, 1)
+    elif o.ndim == 2: o = 0[0]#np.squeeze(o, 0)
     assert False, f'Please, review input dimensions {o.ndim}'
 
 
@@ -115,7 +115,7 @@ def To3DPlusArray(o):
     return To3DPlus(ToArray(o))
 
 
-def ToType(dtype):
+def Todtype(dtype):
     def _to_type(o, dtype=dtype):
         if o.dtype == dtype: return o
         elif isinstance(o, torch.Tensor): o = o.to(dtype=dtype)
