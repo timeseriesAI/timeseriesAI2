@@ -153,7 +153,10 @@ def reverse_dict(dictionary):
 def is_tuple(o): return isinstance(o, tuple)
 
 # Cell
-def itemify(*o): return L(*o).zip()
+def itemify(*o, tup_id=None):
+    items = L(*o).zip()
+    if tup_id is not None: return L([item[tup_id] for item in items])
+    else: return items
 
 # Cell
 def is_none(o):
