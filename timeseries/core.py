@@ -91,7 +91,8 @@ class NumpyDatasets(Datasets):
         self.tls = L(tls if tls else [TfmdLists(item, t, **kwargs) for item,t in zip(items,self.tfms)])
         self.n_inp = (1 if len(self.tls)==1 else len(self.tls)-1) if n_inp is None else n_inp
         if len(self.tls[0]) > 0:
-            self.ptls = L([tl if not self.inplace else tl[:] if type(tl[0]).__name__ == 'memmap' else np.stack(tl[:]) for tl in self.tls])
+            # type(tl[0]).__name__ == 'memmap' is added to avoid loding larger than RAM
+            self.ptls = L([tl if not self.inplace else tl[:] if type(tl[0]).__name__ == 'memmap' else stack(tl[:]) for tl in self.tls])
             self.types = [ifnone(_typ, type(tl[0]) if isinstance(tl[0], torch.Tensor) else tensor) for tl,_typ in zip(self.tls, [self._xtype, self._ytype])]
 
     def __getitem__(self, it):
@@ -130,7 +131,7 @@ class TSDatasets(NumpyDatasets):
         self.tls = L(tls if tls else [TfmdLists(item, t, **kwargs) for item,t in zip(items,self.tfms)])
         self.n_inp = (1 if len(self.tls)==1 else len(self.tls)-1) if n_inp is None else n_inp
         if len(self.tls[0]) > 0:
-            self.ptls = L([tl if not self.inplace else tl[:] if type(tl[0]).__name__ == 'memmap' else np.stack(tl[:]) for tl in self.tls])
+            self.ptls = L([tl if not self.inplace else tl[:] if type(tl[0]).__name__ == 'memmap' else stack(tl[:]) for tl in self.tls])
             self.types = [ifnone(_typ, type(tl[0]) if isinstance(tl[0], torch.Tensor) else tensor) for tl,_typ in zip(self.tls, [self._xtype, self._ytype])]
 
     def __getitem__(self, it):

@@ -3,7 +3,8 @@
 __all__ = ['ToTensor', 'ToArray', 'To3DTensor', 'To2DTensor', 'To1DTensor', 'To3DArray', 'To2DArray', 'To1DArray',
            'To3D', 'To2D', 'To1D', 'To2DPlus', 'To3DPlus', 'To2DPlusTensor', 'To2DPlusArray', 'To3DPlusTensor',
            'To3DPlusArray', 'Todtype', 'bytes2size', 'bytes2GB', 'delete_all_in_dir', 'reverse_dict', 'is_tuple',
-           'itemify', 'is_none', 'ifisnone', 'ifnoneelse', 'ifisnoneelse', 'ifelse', 'cycle_dl', 'device', 'cpus']
+           'itemify', 'is_none', 'ifisnone', 'ifnoneelse', 'ifisnoneelse', 'ifelse', 'stack', 'cycle_dl', 'device',
+           'cpus']
 
 # Cell
 from timeseries import *
@@ -177,6 +178,12 @@ def ifisnoneelse(a, b, c=None):
 def ifelse(a, b, c):
     "`b` if `a` is True else `c`"
     return b if a else c
+
+# Cell
+def stack(o, axis=0):
+    if isinstance(o[0], np.ndarray): return np.stack(o, axis)
+    elif isinstance(o[0], torch.Tensor): return torch.stack(tuple(o), dim=axis)
+    assert False, f'cannot stack this data type {type(o[0])}'
 
 # Cell
 # This is a convenience function will use later proposed by Thomas Capelle @tcapelle to be able to easily benchmark performance
