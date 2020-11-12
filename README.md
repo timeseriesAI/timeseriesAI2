@@ -1,4 +1,2 @@
-# nbdev template
-
-Use this template to more easily create your nbdev project.
+# timeseriesAI/timeseriesAI repo has been moved to [timeseriesAI/tsai](https://github.com/timeseriesAI/tsai)
 
